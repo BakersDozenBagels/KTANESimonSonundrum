@@ -322,4 +322,42 @@ public class SimonSonundrumScript : MonoBehaviour
 
         public bool PreviousApplied;
     }
+
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"Use ""!{0} tl"" to press that button. Valid buttons are tl, tr, bl, and br. ";
+#pragma warning restore 414
+
+    private KMSelectable[] ProcessTwitchCommand(string command)
+    {
+        switch(command.Trim().ToLowerInvariant())
+        {
+            case "tl":
+                return new KMSelectable[] { _buttons[0] };
+            case "tr":
+                return new KMSelectable[] { _buttons[1] };
+            case "bl":
+                return new KMSelectable[] { _buttons[2] };
+            case "br":
+                return new KMSelectable[] { _buttons[3] };
+        }
+
+        return null;
+    }
+
+    private IEnumerator TwitchHandleForcedSolve()
+    {
+        Log("Module force solved.");
+        StartCoroutine(AutoSolve());
+        while(!_isSolved)
+            yield return true;
+    }
+
+    private IEnumerator AutoSolve()
+    {
+        while(!_isSolved)
+        {
+            yield return new WaitWhile(() => _requiredPress == 0);
+            _buttons[_requiredPress - 1].OnInteract();
+        }
+    }
 }
